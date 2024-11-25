@@ -1,6 +1,7 @@
 plugins {
     `kotlin-dsl`
-    `maven-publish`
+    alias(libs.plugins.gradle.publish)
+    alias(libs.plugins.ktlint.gradle)
 }
 
 group = "com.shykial.aoc"
@@ -19,26 +20,15 @@ kotlin {
 }
 
 gradlePlugin {
+    website = "https://github.com/Shykial/aoc-inputs-downloader"
+    vcsUrl = "https://github.com/Shykial/aoc-inputs-downloader.git"
     plugins {
         create("inputsDownloaderPlugin") {
             id = "com.shykial.aoc.inputs.downloader"
             implementationClass = "com.shykial.aoc.inputsDownloader.InputsDownloaderPlugin"
-        }
-    }
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            artifactId = "inputs-downloader"
-            version = "0.0.3"
-
-            from(components["java"])
+            displayName = "Advent of Code inputs downloader plugin"
+            description = "Simple gradle plugin for automatic downloading of advent-of-code inputs"
+            tags = setOf("advent-of-code")
         }
     }
 }

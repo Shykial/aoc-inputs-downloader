@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import org.gradle.kotlin.dsl.property
@@ -19,15 +20,24 @@ abstract class DownloadInputsTask @Inject constructor(project: Project) : Defaul
 
     @Input
     @Option(option = "sessionCookie", description = "Session cookie")
-    val sessionCookie = project.objects.property<String>()
+    @Optional
+    val sessionCookieParam = project.objects.property<String>()
+
+    @Input
+    @Optional
+    val sessionCookieProvider = project.objects.property<(() -> String)?>()
+
+    @Input
+    val fileNameMapping = project.objects.property<(Int) -> String>()
 
     @TaskAction
     fun downloadInputs() {
         runBlocking {
-            InputsDownloader.downloadMissingInputs(
+            InputsDownloader.downloadAocInputs(
                 inputDirectory = inputsDirectory.get(),
-                sessionCookie = sessionCookie.get(),
-                aocYear = aocYear.get()
+                sessionCookieProvider = sessionCookieParam.orNull?.let { { it } } ?: sessionCookieProvider.get(),
+                fileNameMapping = fileNameMapping.get(),
+                aocYear = aocYear.get(),
             )
         }
     }
